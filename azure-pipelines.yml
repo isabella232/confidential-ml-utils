@@ -1,0 +1,8 @@
+trigger:
+- master
+
+steps:
+
+- pwsh: |
+    docker run --rm -v ${PWD}:/data markdownlint/markdownlint .
+  displayName: lint markdown
