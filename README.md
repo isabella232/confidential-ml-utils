@@ -17,6 +17,12 @@ TODO: more.
 
 TODO: how to install via pip + GitHub link?
 
+https://stackoverflow.com/a/15268990
+
+```bash
+pip install git+https://github.com/Azure/confidential-ml-utils#egg=httpie
+```
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
