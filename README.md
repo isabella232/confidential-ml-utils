@@ -1,17 +1,11 @@
 # Confidential ML Utilities
 
-![Python package](https://github.com/Azure/confidential-ml-utils/workflows/Python%20package/badge.svg)
-
-Confidential ML is the practise of training machine learning models without
+Confidential ML is the practice of training machine learning models without
 seeing the training data. It is needed in many enterprises to satisfy the
 strict compliance and privacy guarantees they provide to their customers. This
 repository contains a set of utilities for confidential ML, with a special
 emphasis on using PyTorch in
 [Azure Machine Learning pipelines](https://aka.ms/pl-concept).
-
-## Problem
-
-TODO: more.
 
 ## Contributing
 
