@@ -1,3 +1,0 @@
-azureml-sdk>=1.4.0
-flake8>=3.7.9
-pytest>=5.4.2
