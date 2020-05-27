@@ -52,6 +52,9 @@ Code which consumes this library should have the same "look and feel" as code
 consuming the Python standard library's
 [`logging`](https://docs.python.org/3/library/logging.html) module.
 
+:warning: This entire document relies on the assumption that the filtering
+mechanism looks for a specific prefix in log lines.
+
 ## Proposal
 
 I propose that the existing logging paradigm in Python be mostly unchanged, with
@@ -102,8 +105,15 @@ Not just prefix, more complicated "mutation" logic.
 ### Hash unsafe log lines
 
 Provide option to hash unsafe log lines.
+
 - Not compliant.
 - Other option, record their length `Unsafe log message of length 23`
+
+### Write public logs to pre-specified location
+
+Instead of adding a predetermined prefix to "public" logs, depending on the
+log filtering / scrubbing mechanisms, another alternative would be to write
+public logs to a specific file.
 
 ## Risks
 
@@ -126,3 +136,8 @@ print('SystemLog: private data')
 
 Confidential machine learning in this context involves an element of trust, i.e.
 it is not designed or intended to stop malicious actors.
+
+We do **not** attempt to mitigate this risk by filtering out specific types of
+objects from "public" logs. Standard Python types like `str` and
+`pandas.DataFrame` can easily contain sensitive customer data. If we exclude
+those from logging, we will be excluding nearly all helpful logs.
