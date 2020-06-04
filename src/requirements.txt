@@ -1,0 +1,2 @@
+black>=19.10b0
+typeguard>=2.8.0
