@@ -1,5 +1,13 @@
+# Confidential ML Utilities
 
-# Contributing
+Confidential ML is the practice of training machine learning models without
+seeing the training data. It is needed in many enterprises to satisfy the
+strict compliance and privacy guarantees they provide to their customers. This
+repository contains a set of utilities for confidential ML, with a special
+emphasis on using PyTorch in
+[Azure Machine Learning pipelines](https://aka.ms/pl-concept).
+
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
