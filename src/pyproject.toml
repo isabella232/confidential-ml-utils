@@ -1,0 +1,10 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "confidential_ml_utils"
+author = "AML Data Science"
+author-email = "aml-ds@microsoft.com"
+home-page = "https://github.com/Azure/confidential-ml-utils"
+classifiers = ["License :: OSI Approved :: MIT License"]
