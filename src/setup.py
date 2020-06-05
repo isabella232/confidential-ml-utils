@@ -13,7 +13,7 @@ README = (HERE / ".." / "README.md").read_text()
 
 setup(
     name="confidential-ml-utils",
-    version="0.1.0",
+    version="0.0.0",
     description="Utilities for confidential machine learning",
     long_description=README,
     long_description_content_type="text/markdown",
