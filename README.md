@@ -1,5 +1,7 @@
 # Confidential ML Utilities
 
+[![python](https://github.com/Azure/confidential-ml-utils/workflows/python/badge.svg)](https://github.com/Azure/confidential-ml-utils/actions?query=workflow%3Apython)
+
 Confidential ML is the practice of training machine learning models without
 seeing the training data. It is needed in many enterprises to satisfy the
 strict compliance and privacy guarantees they provide to their customers. This
