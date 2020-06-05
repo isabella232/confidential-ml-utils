@@ -2,7 +2,7 @@ name: python
 
 on:
   push:
-    branches: [ first, master ]
+    branches: [ master ]
     tags: [ 'v0.*' ]
   pull_request:
     branches: [ master ]
