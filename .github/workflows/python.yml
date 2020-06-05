@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -31,7 +31,8 @@ jobs:
         black --check src
     - name: flake8
       run: |
-        flake8 src
+        flake8 .
+      working-directory: src
     - name: pytest
       run: |
         pytest src
