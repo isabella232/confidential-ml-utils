@@ -4,7 +4,8 @@ from confidential_ml_utils.exceptions import *
 
 
 @pytest.mark.parametrize(
-    "message,exec_type", [("foo", ArithmeticError), ("secret data", KeyError)]
+    "message,exec_type",
+    [("foo", ArithmeticError), ("secret data", KeyError), ("baz", Exception)],
 )
 def test_prefix_stack_trace_preserves_exception_type(message: str, exec_type):
     file = io.StringIO()
