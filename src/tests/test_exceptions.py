@@ -1,6 +1,6 @@
 import io
 import pytest
-from confidential_ml_utils.exceptions import *
+from confidential_ml_utils.exceptions import prefix_stack_trace, SCRUB_MESSAGE
 
 
 @pytest.mark.parametrize(

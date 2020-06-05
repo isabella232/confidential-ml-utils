@@ -1,3 +1,9 @@
+"""
+Setup script for this Python package.
+https://docs.python.org/3/distutils/setupscript.html
+"""
+
+
 import pathlib
 from setuptools import setup
 

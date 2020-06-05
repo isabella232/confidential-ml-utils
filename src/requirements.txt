@@ -1,5 +1,4 @@
-black>=19.10b0
+black>=19
 flake8>=3.8.2
-pylint>=2.5.2
 pytest>=5.4.2
 typeguard>=2.8.0

@@ -32,9 +32,6 @@ jobs:
     - name: flake8
       run: |
         flake8 src
-    - name: pylint
-      run: |
-        pylint src
     - name: pytest
       run: |
         pytest src
