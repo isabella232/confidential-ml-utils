@@ -24,9 +24,13 @@ def scrub_exception_traceback(
     """
     exception._str = scrub_message
     if exception.__cause__:
-        exception.__cause__ = scrub_exception_traceback(exception.__cause__)
+        exception.__cause__ = scrub_exception_traceback(
+            exception.__cause__, scrub_message
+        )
     if exception.__context__:
-        exception.__context__ = scrub_exception_traceback(exception.__context__)
+        exception.__context__ = scrub_exception_traceback(
+            exception.__context__, scrub_message
+        )
     return exception
 
 
