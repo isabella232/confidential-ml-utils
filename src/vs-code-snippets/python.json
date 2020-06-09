@@ -1,0 +1,42 @@
+{
+    "Basic core imports": {
+        "prefix": "workspace-imports-creation",
+        "body": [
+            "from azureml.core import Workspace, Experiment, Run, RunConfiguration, ComputeTarget$1",
+            "$0"
+        ],
+        "description": "Import essential packages"
+    },
+
+    "Pipeline Imports": {
+        "prefix": "pipeline-imports",
+        "body": [
+            "from azureml.pipeline.core import Pipeline, PipelineData, PipelineParameter",
+            "from azureml.pipeline.steps import PythonScriptStep$1",
+            "$0"
+        ],
+        "description": "Basic imports for pipeline"
+    },
+
+    "Create AML Workspace from config": {
+        "prefix": ["workspace-quick","fromconfig","from-config"],
+        "body": [
+            "ws = Workspace.from_config()",
+            "$0"
+        ],
+        "description": "Default workspace creation"
+    },
+
+    "Create AML Workspace from config and auth": {
+        "prefix": "workspace-from-config-auth",
+        "body": [
+            "from azureml.core.authentication import InteractiveLoginAuthentication",
+            "config = {'subscription_id':'$1',",
+            "'resource_group':'$2',",
+            "'workspace_name' :'$3'}",
+            "ws = Workspace(**config,auth = auth)",
+            "$0"
+        ],
+        "description": "Create workspace from config and auth"
+    }
+}   
