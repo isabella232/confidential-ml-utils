@@ -45,3 +45,23 @@ jobs:
       with:
         name: dist
         path: src/dist
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: download wheel
+      uses: actions/download-artifact@v2
+
+    # Follow:
+    # https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+    # to publish the generated wheel to pypi.org. You may optionally remove the
+    # 'if' condition, and add a 'with'
+    # repository_url: https://test.pypi.org/legacy, and use the password
+    # test_pypi_password to verify that publication to test.pypi.org works.
+    - name: pypi
+      if: startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
