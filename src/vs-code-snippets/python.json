@@ -38,5 +38,17 @@
             "$0"
         ],
         "description": "Create workspace from config and auth"
+    },
+
+    "Create Compute Cluster with SSH": {
+        "prefix": ["create-compute-cluster-ssh"],
+        "body": [
+            "from azureml.core.compute import AmlCompute",
+            "from azureml.core.compute_target import ComputeTargetException",
+            "ssh_public_key = '$1'",
+            "compute_config = AmlCompute.provisioning_configuration(vm_size='$4',min_nodes=$5, max_nodes=$6,admin_username='$7',admin_user_ssh_key=ssh_public_key,vm_priority='${8|lowpriority,dedicated|}',remote_login_port_public_access='Enabled')",
+            "cluster$0 = ComputeTarget.create(workspace=$9, name='$10', compute_config)"
+        ],
+        "description": "Create compute cluster with SSH enabled"
     }
 }   
