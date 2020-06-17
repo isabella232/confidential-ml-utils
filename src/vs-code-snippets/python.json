@@ -34,6 +34,7 @@
             "config = {'subscription_id':'$1',",
             "'resource_group':'$2',",
             "'workspace_name' :'$3'}",
+            "auth = InteractiveLoginAuthentication()",
             "ws = Workspace(**config,auth = auth)",
             "$0"
         ],
