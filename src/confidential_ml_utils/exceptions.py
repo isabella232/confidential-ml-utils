@@ -9,9 +9,9 @@ import io
 from traceback import TracebackException
 from typing import Callable
 import sys
+from confidential_ml_utils.logging import PREFIX
 
 
-PREFIX = "SystemLog:"
 SCRUB_MESSAGE = "**Exception message scrubbed**"
 
 

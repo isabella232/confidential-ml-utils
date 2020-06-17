@@ -5,7 +5,7 @@ TODO: proper docstring.
 from enum import Enum
 
 
-class DataCategory(DocEnum):
+class DataCategory(Enum):
     """
     TODO: proper docstring.
     """
