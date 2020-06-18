@@ -16,7 +16,7 @@ SCRUB_MESSAGE = "**Exception message scrubbed**"
 
 
 def scrub_exception_traceback(
-    exception: TracebackException, scrub_message: str
+    exception: TracebackException, scrub_message: str = SCRUB_MESSAGE
 ) -> TracebackException:
     """
     Scrub exception messages from a `TracebackException` object. The messages
@@ -35,14 +35,20 @@ def scrub_exception_traceback(
 
 
 def print_prefixed_stack_trace(
-    file: io.TextIOBase, prefix: str, scrub_message: str
+    file: io.TextIOBase = sys.stderr,
+    prefix: str = PREFIX,
+    scrub_message: str = SCRUB_MESSAGE,
+    keep_message: bool = False,
 ) -> None:
     """
     Print the current exception and stack trace to `file` (usually client
     standard error), prefixing the stack trace with `prefix`.
     """
     exception = TracebackException(*sys.exc_info())
-    scrubbed_exception = scrub_exception_traceback(exception, scrub_message)
+    if keep_message:
+        scrubbed_exception = exception
+    else:
+        scrubbed_exception = scrub_exception_traceback(exception, scrub_message)
     traceback = list(scrubbed_exception.format())
     for execution in traceback:
         if "return function(*func_args, **func_kwargs)" in execution:
@@ -58,6 +64,7 @@ def prefix_stack_trace(
     disable: bool = sys.flags.debug,
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
+    keep_message: bool = False,
 ) -> Callable:
     """
     Decorator which wraps the decorated function and prints the stack trace of
@@ -86,7 +93,7 @@ def prefix_stack_trace(
             try:
                 return function(*func_args, **func_kwargs)
             except BaseException:
-                print_prefixed_stack_trace(file, prefix, scrub_message)
+                print_prefixed_stack_trace(file, prefix, scrub_message, keep_message)
                 raise
 
         return function if disable else wrapper
