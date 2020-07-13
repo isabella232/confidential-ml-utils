@@ -1,6 +1,8 @@
 import io
 import pytest
-from confidential_ml_utils.exceptions import prefix_stack_trace, SCRUB_MESSAGE
+from confidential_ml_utils.exceptions import prefix_stack_trace, \
+    SCRUB_MESSAGE, is_exception_whitelisted
+from traceback import TracebackException
 
 
 @pytest.mark.parametrize(
@@ -79,3 +81,57 @@ def test_prefix_stack_trace_respects_scrub_message(message):
         function()
 
     assert message in file.getvalue()
+
+
+@pytest.mark.parametrize("keep_message, whitelist, expected_result",
+    [(False, ["arithmetic", "ModuleNotFound"], True),   #scrub_message with whitelist
+     (False, [], False),                                #scrub_message
+     (True, [], True)])                                 #keep_message
+def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_result):
+    file = io.StringIO()
+    message = 'Bingo. It is a pickle.'
+
+    def function1():
+        raise ModuleNotFoundError(message)
+
+    @prefix_stack_trace(file, keep_message=keep_message, whitelist=whitelist)
+    def function2():
+        try:
+            function1()
+        except:
+            raise ArithmeticError()
+
+    with pytest.raises(Exception):
+        function2()
+
+    assert (message in file.getvalue()) == expected_result
+
+
+@pytest.mark.parametrize("whitelist, expected_result", 
+    [(["arithmetic"], True),                    #whitelist match error type
+     (["arithmetic", "ModuleNotFound"], True),  #whitelist multiple strings
+     (["geometry", "algebra"], False),          #whitelist no match
+     (['bingo'], True)])                        #whitelist match error message
+def test_prefix_stack_trace_whitelist(whitelist, expected_result):
+    file = io.StringIO()
+    message = 'Bingo. It is a pickle.'
+
+    @prefix_stack_trace(file, whitelist=whitelist)
+    def function():
+        raise ArithmeticError(message)
+
+    with pytest.raises(Exception):
+        function()
+
+    assert (message in file.getvalue()) == expected_result
+
+
+@pytest.mark.parametrize("whitelist, expected_result",
+    [(['argparse', 'ModuleNotFound'], True),
+     (['argparse', 'type'], False),
+     (['Bingo..+Pickle'], True),
+     ([], False)])
+def test_is_exception_whitelisted(whitelist, expected_result):
+    exception = ModuleNotFoundError('Bingo. It is a pickle.')
+    res = is_exception_whitelisted(TracebackException.from_exception(exception), whitelist)
+    assert res == expected_result
