@@ -89,10 +89,9 @@ def test_prefix_stack_trace_respects_scrub_message(message):
      (True, [], True)])                                 #keep_message
 def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_result):
     file = io.StringIO()
-    message = 'Bingo. It is a pickle.'
 
     def function1():
-        raise ModuleNotFoundError(message)
+        import my_custom_library
 
     @prefix_stack_trace(file, keep_message=keep_message, whitelist=whitelist)
     def function2():
@@ -104,21 +103,21 @@ def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_r
     with pytest.raises(Exception):
         function2()
 
-    assert (message in file.getvalue()) == expected_result
+    assert ('No module named' in file.getvalue()) == expected_result
 
 
 @pytest.mark.parametrize("whitelist, expected_result", 
-    [(["arithmetic"], True),                    #whitelist match error type
+    [(["ModuleNotFound"], True),                    #whitelist match error type
      (["arithmetic", "ModuleNotFound"], True),  #whitelist multiple strings
      (["geometry", "algebra"], False),          #whitelist no match
-     (['bingo'], True)])                        #whitelist match error message
+     (['my_custom_library'], True)])                        #whitelist match error message
 def test_prefix_stack_trace_whitelist(whitelist, expected_result):
     file = io.StringIO()
-    message = 'Bingo. It is a pickle.'
+    message = 'No module named'
 
     @prefix_stack_trace(file, whitelist=whitelist)
     def function():
-        raise ArithmeticError(message)
+        import my_custom_library
 
     with pytest.raises(Exception):
         function()

@@ -45,9 +45,9 @@ def is_exception_whitelisted(
     """
     Check if message is whitelisted
     Args:
-        message (str): the exception message string
-        whitelist (list): list of regex expressions. If any expression matches the 
-            message , it will be considered whitelisted.
+        exception (TracebackException): the exception to test
+        whitelist (list): list of regex expressions. If any expression matches
+            the exception name or message, it will be considered whitelisted.
     Returns:
         bool: True if message is whitelisted, False otherwise.
     """
@@ -71,9 +71,9 @@ def print_prefixed_stack_trace(
     Print the current exception and stack trace to `file` (usually client
     standard error), prefixing the stack trace with `prefix`.
     Args:
-        keep_message (bool): if True, don't scrub message. If false, scrub unless whitelisted.
-        whitelist (list): exception message whitelist. Ignored is keep_message is True. If empty, 
-            all messages will e srubbed.
+        keep_message (bool): if True, don't scrub message. If false, scrub (unless whitelisted).
+        whitelist (list): exception whitelist. Ignored if keep_message is True. If empty
+            all messages will be srubbed.
     """
     exception = TracebackException(*sys.exc_info())
     if keep_message:
