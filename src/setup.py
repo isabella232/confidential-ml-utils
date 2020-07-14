@@ -6,6 +6,8 @@ https://docs.python.org/3/distutils/setupscript.html
 
 import pathlib
 from setuptools import setup
+from confidential_ml_utils import __version__
+
 
 HERE = pathlib.Path(__file__).parent
 
@@ -13,7 +15,7 @@ README = (HERE / ".." / "README.md").read_text()
 
 setup(
     name="confidential-ml-utils",
-    version="0.1.0",
+    version=__version__,
     description="Utilities for confidential machine learning",
     long_description=README,
     long_description_content_type="text/markdown",
