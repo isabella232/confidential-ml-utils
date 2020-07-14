@@ -100,6 +100,8 @@ def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_r
     def function1():
         import my_custom_library
 
+        my_custom_library
+
     @prefix_stack_trace(file, keep_message=keep_message, whitelist=whitelist)
     def function2():
         try:
@@ -129,6 +131,8 @@ def test_prefix_stack_trace_whitelist(whitelist, expected_result):
     @prefix_stack_trace(file, whitelist=whitelist)
     def function():
         import my_custom_library
+
+        my_custom_library
 
     with pytest.raises(Exception):
         function()
