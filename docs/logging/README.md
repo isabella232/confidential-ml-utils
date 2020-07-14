@@ -23,8 +23,8 @@ The simplest use case (wrap your `main` method in a decorator) is in:
 Some configuration options around prefixing the stack trace. [prefix-stack-trace.py](./prefix-stack-trace.py). You can:
 -  customize the prefix and the exception message
 -  keep the original exception message (don't scrub)
--  pass a whitelist of strings. Exception messages will be scrubbed unless the message or the
-exception type regex match one of the whitelist strings.
+-  pass an allow_list of strings. Exception messages will be scrubbed unless the message or the
+exception type regex match one of the allow_list strings.
 
 Using this library directly inside `try` / `except` statements:
 [try-except.py](./try-except.py)

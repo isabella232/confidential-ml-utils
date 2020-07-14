@@ -3,7 +3,7 @@ import pytest
 from confidential_ml_utils.exceptions import (
     prefix_stack_trace,
     SCRUB_MESSAGE,
-    is_exception_whitelisted,
+    is_exception_allowed,
 )
 from traceback import TracebackException
 
@@ -87,14 +87,18 @@ def test_prefix_stack_trace_respects_scrub_message(message):
 
 
 @pytest.mark.parametrize(
-    "keep_message, whitelist, expected_result",
+    "keep_message, allow_list, expected_result",
     [
-        (False, ["arithmetic", "ModuleNotFound"], True),  # scrub_message with whitelist
+        (
+            False,
+            ["arithmetic", "ModuleNotFound"],
+            True,
+        ),  # scrub_message with allow_list
         (False, [], False),  # scrub_message
         (True, [], True),
     ],
 )  # keep_message
-def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_result):
+def test_prefix_stack_trace_nested_exception(keep_message, allow_list, expected_result):
     file = io.StringIO()
 
     def function1():
@@ -102,7 +106,7 @@ def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_r
 
         my_custom_library.foo()
 
-    @prefix_stack_trace(file, keep_message=keep_message, whitelist=whitelist)
+    @prefix_stack_trace(file, keep_message=keep_message, allow_list=allow_list)
     def function2():
         try:
             function1()
@@ -116,19 +120,19 @@ def test_prefix_stack_trace_nested_exception(keep_message, whitelist, expected_r
 
 
 @pytest.mark.parametrize(
-    "whitelist, expected_result",
+    "allow_list, expected_result",
     [
-        (["ModuleNotFound"], True),  # whitelist match error type
-        (["arithmetic", "ModuleNotFound"], True),  # whitelist multiple strings
-        (["geometry", "algebra"], False),  # whitelist no match
+        (["ModuleNotFound"], True),  # allow_list match error type
+        (["arithmetic", "ModuleNotFound"], True),  # allow_list multiple strings
+        (["geometry", "algebra"], False),  # allow_list no match
         (["my_custom_library"], True),
     ],
-)  # whitelist match error message
-def test_prefix_stack_trace_whitelist(whitelist, expected_result):
+)  # allow_list match error message
+def test_prefix_stack_trace_allow_list(allow_list, expected_result):
     file = io.StringIO()
     message = "No module named"
 
-    @prefix_stack_trace(file, whitelist=whitelist)
+    @prefix_stack_trace(file, allow_list=allow_list)
     def function():
         import my_custom_library
 
@@ -141,7 +145,7 @@ def test_prefix_stack_trace_whitelist(whitelist, expected_result):
 
 
 @pytest.mark.parametrize(
-    "whitelist, expected_result",
+    "allow_list, expected_result",
     [
         (["argparse", "ModuleNotFound"], True),
         (["argparse", "type"], False),
@@ -149,9 +153,7 @@ def test_prefix_stack_trace_whitelist(whitelist, expected_result):
         ([], False),
     ],
 )
-def test_is_exception_whitelisted(whitelist, expected_result):
+def test_is_exception_allowed(allow_list, expected_result):
     exception = ModuleNotFoundError("Bingo. It is a pickle.")
-    res = is_exception_whitelisted(
-        TracebackException.from_exception(exception), whitelist
-    )
+    res = is_exception_allowed(TracebackException.from_exception(exception), allow_list)
     assert res == expected_result
