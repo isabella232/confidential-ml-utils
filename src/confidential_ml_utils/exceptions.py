@@ -17,9 +17,9 @@ SCRUB_MESSAGE = "**Exception message scrubbed**"
 
 
 def scrub_exception_traceback(
-    exception: TracebackException, 
+    exception: TracebackException,
     scrub_message: str = SCRUB_MESSAGE,
-    whitelist: list = []
+    whitelist: list = [],
 ) -> TracebackException:
     """
     Scrub exception messages from a `TracebackException` object. The messages
@@ -38,10 +38,7 @@ def scrub_exception_traceback(
     return exception
 
 
-def is_exception_whitelisted(
-    exception: TracebackException,
-    whitelist: list
-) -> bool:
+def is_exception_whitelisted(exception: TracebackException, whitelist: list) -> bool:
     """
     Check if message is whitelisted
     Args:
@@ -65,13 +62,14 @@ def print_prefixed_stack_trace(
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
-    whitelist: list = []
+    whitelist: list = [],
 ) -> None:
     """
     Print the current exception and stack trace to `file` (usually client
     standard error), prefixing the stack trace with `prefix`.
     Args:
-        keep_message (bool): if True, don't scrub message. If false, scrub (unless whitelisted).
+        keep_message (bool): if True, don't scrub message. If false, scrub (unless
+            whitelisted).
         whitelist (list): exception whitelist. Ignored if keep_message is True. If empty
             all messages will be srubbed.
     """
@@ -79,7 +77,9 @@ def print_prefixed_stack_trace(
     if keep_message:
         scrubbed_exception = exception
     else:
-        scrubbed_exception = scrub_exception_traceback(exception, scrub_message, whitelist)
+        scrubbed_exception = scrub_exception_traceback(
+            exception, scrub_message, whitelist
+        )
     traceback = list(scrubbed_exception.format())
     for execution in traceback:
         if "return function(*func_args, **func_kwargs)" in execution:
@@ -96,7 +96,7 @@ def prefix_stack_trace(
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
-    whitelist: list = []
+    whitelist: list = [],
 ) -> Callable:
     """
     Decorator which wraps the decorated function and prints the stack trace of
@@ -125,7 +125,9 @@ def prefix_stack_trace(
             try:
                 return function(*func_args, **func_kwargs)
             except BaseException:
-                print_prefixed_stack_trace(file, prefix, scrub_message, keep_message, whitelist)
+                print_prefixed_stack_trace(
+                    file, prefix, scrub_message, keep_message, whitelist
+                )
                 raise
 
         return function if disable else wrapper
