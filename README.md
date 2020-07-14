@@ -13,23 +13,11 @@ emphasis on using PyTorch in
 
 ## Using
 
-First execute `pip install confidential-ml-utils` to install this library. Then
-wrap any methods which may throw an exception with the decorator
-`prefix_stack_trace`. Here's a simple example.
+VS Code Snippets see:
+[docs/snippets](.docs/../docs/snippets/README.md)
 
-```python
-from confidential_ml_utils.exceptions import prefix_stack_trace
-
-@prefix_stack_trace()
-def main():
-    print("Hello, world!")
-
-if __name__ == "__main__":
-    main()
-```
-
-There is a more comprehensive set of examples in
-[docs/samples](./docs/samples/README.md).
+Compliant logging library see:
+[docs/logging](./docs/logging/README.md)
 
 ## Contributing
 

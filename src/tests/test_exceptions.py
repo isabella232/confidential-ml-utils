@@ -1,6 +1,11 @@
 import io
 import pytest
-from confidential_ml_utils.exceptions import prefix_stack_trace, SCRUB_MESSAGE
+from confidential_ml_utils.exceptions import (
+    prefix_stack_trace,
+    SCRUB_MESSAGE,
+    is_exception_allowed,
+)
+from traceback import TracebackException
 
 
 @pytest.mark.parametrize(
@@ -79,3 +84,76 @@ def test_prefix_stack_trace_respects_scrub_message(message):
         function()
 
     assert message in file.getvalue()
+
+
+@pytest.mark.parametrize(
+    "keep_message, allow_list, expected_result",
+    [
+        (
+            False,
+            ["arithmetic", "ModuleNotFound"],
+            True,
+        ),  # scrub_message with allow_list
+        (False, [], False),  # scrub_message
+        (True, [], True),
+    ],
+)  # keep_message
+def test_prefix_stack_trace_nested_exception(keep_message, allow_list, expected_result):
+    file = io.StringIO()
+
+    def function1():
+        import my_custom_library
+
+        my_custom_library.foo()
+
+    @prefix_stack_trace(file, keep_message=keep_message, allow_list=allow_list)
+    def function2():
+        try:
+            function1()
+        except ModuleNotFoundError:
+            raise ArithmeticError()
+
+    with pytest.raises(Exception):
+        function2()
+
+    assert ("No module named" in file.getvalue()) == expected_result
+
+
+@pytest.mark.parametrize(
+    "allow_list, expected_result",
+    [
+        (["ModuleNotFound"], True),  # allow_list match error type
+        (["arithmetic", "ModuleNotFound"], True),  # allow_list multiple strings
+        (["geometry", "algebra"], False),  # allow_list no match
+        (["my_custom_library"], True),
+    ],
+)  # allow_list match error message
+def test_prefix_stack_trace_allow_list(allow_list, expected_result):
+    file = io.StringIO()
+    message = "No module named"
+
+    @prefix_stack_trace(file, allow_list=allow_list)
+    def function():
+        import my_custom_library
+
+        my_custom_library.foo()
+
+    with pytest.raises(Exception):
+        function()
+
+    assert (message in file.getvalue()) == expected_result
+
+
+@pytest.mark.parametrize(
+    "allow_list, expected_result",
+    [
+        (["argparse", "ModuleNotFound"], True),
+        (["argparse", "type"], False),
+        (["Bingo..+Pickle"], True),
+        ([], False),
+    ],
+)
+def test_is_exception_allowed(allow_list, expected_result):
+    exception = ModuleNotFoundError("Bingo. It is a pickle.")
+    res = is_exception_allowed(TracebackException.from_exception(exception), allow_list)
+    assert res == expected_result

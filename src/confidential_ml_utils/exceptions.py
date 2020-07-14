@@ -9,6 +9,7 @@ import io
 from traceback import TracebackException
 from typing import Callable
 import sys
+import re
 
 
 PREFIX = "SystemLog:"
@@ -16,22 +17,44 @@ SCRUB_MESSAGE = "**Exception message scrubbed**"
 
 
 def scrub_exception_traceback(
-    exception: TracebackException, scrub_message: str = SCRUB_MESSAGE
+    exception: TracebackException,
+    scrub_message: str = SCRUB_MESSAGE,
+    allow_list: list = [],
 ) -> TracebackException:
     """
     Scrub exception messages from a `TracebackException` object. The messages
-    will be replaced with `exceptions.PREFIX`.
+    will be replaced with `exceptions.SCRUB_MESSAGE`.
     """
-    exception._str = scrub_message
+    if not is_exception_allowed(exception, allow_list):
+        exception._str = scrub_message
     if exception.__cause__:
         exception.__cause__ = scrub_exception_traceback(
-            exception.__cause__, scrub_message
+            exception.__cause__, scrub_message, allow_list
         )
     if exception.__context__:
         exception.__context__ = scrub_exception_traceback(
-            exception.__context__, scrub_message
+            exception.__context__, scrub_message, allow_list
         )
     return exception
+
+
+def is_exception_allowed(exception: TracebackException, allow_list: list) -> bool:
+    """
+    Check if message is allowed
+    Args:
+        exception (TracebackException): the exception to test
+        allow_list (list): list of regex expressions. If any expression matches
+            the exception name or message, it will be considered allowed.
+    Returns:
+        bool: True if message is allowed, False otherwise.
+    """
+    # empty list means all messages are allowed
+    for expr in allow_list:
+        if re.search(expr, exception._str, re.IGNORECASE):
+            return True
+        if re.search(expr, exception.exc_type.__name__, re.IGNORECASE):
+            return True
+    return False
 
 
 def print_prefixed_stack_trace(
@@ -39,16 +62,24 @@ def print_prefixed_stack_trace(
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
+    allow_list: list = [],
 ) -> None:
     """
     Print the current exception and stack trace to `file` (usually client
     standard error), prefixing the stack trace with `prefix`.
+    Args:
+        keep_message (bool): if True, don't scrub message. If false, scrub (unless
+            allowed).
+        allow_list (list): exception allow_list. Ignored if keep_message is True. If
+            empty all messages will be srubbed.
     """
     exception = TracebackException(*sys.exc_info())
     if keep_message:
         scrubbed_exception = exception
     else:
-        scrubbed_exception = scrub_exception_traceback(exception, scrub_message)
+        scrubbed_exception = scrub_exception_traceback(
+            exception, scrub_message, allow_list
+        )
     traceback = list(scrubbed_exception.format())
     for execution in traceback:
         if "return function(*func_args, **func_kwargs)" in execution:
@@ -65,6 +96,7 @@ def prefix_stack_trace(
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
+    allow_list: list = [],
 ) -> Callable:
     """
     Decorator which wraps the decorated function and prints the stack trace of
@@ -93,7 +125,9 @@ def prefix_stack_trace(
             try:
                 return function(*func_args, **func_kwargs)
             except BaseException:
-                print_prefixed_stack_trace(file, prefix, scrub_message, keep_message)
+                print_prefixed_stack_trace(
+                    file, prefix, scrub_message, keep_message, allow_list
+                )
                 raise
 
         return function if disable else wrapper
