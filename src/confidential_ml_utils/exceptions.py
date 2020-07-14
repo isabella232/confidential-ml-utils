@@ -70,8 +70,8 @@ def print_prefixed_stack_trace(
     Args:
         keep_message (bool): if True, don't scrub message. If false, scrub (unless
             allowed).
-        allow_list (list): exception allow_list. Ignored if keep_message is True. If empty
-            all messages will be srubbed.
+        allow_list (list): exception allow_list. Ignored if keep_message is True. If
+            empty all messages will be srubbed.
     """
     exception = TracebackException(*sys.exc_info())
     if keep_message:
