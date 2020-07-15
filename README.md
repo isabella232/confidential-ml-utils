@@ -14,10 +14,10 @@ emphasis on using PyTorch in
 ## Using
 
 VS Code Snippets see:
-[docs/snippets](.docs/../docs/snippets/README.md)
+[docs/snippets](https://github.com/Azure/confidential-ml-utils/blob/master/docs/snippets/README.md)
 
 Compliant logging library see:
-[docs/logging](./docs/logging/README.md)
+[docs/logging](https://github.com/Azure/confidential-ml-utils/blob/master/docs/logging/README.md)
 
 ## Contributing
 
