@@ -24,7 +24,7 @@ def test_prefix_stack_trace_preserves_exception_type(message: str, exec_type):
     def function():
         raise exec_type(message)
 
-    with pytest.raises(exec_type) as info:
+    with pytest.raises(exec_type):
         function()
 
     log_lines = file.getvalue()
