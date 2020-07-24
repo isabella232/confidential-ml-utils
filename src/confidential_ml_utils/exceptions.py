@@ -95,7 +95,7 @@ def print_prefixed_stack_trace_and_raise(
     # raise compliant error
     if not err:
         raise
-     elif keep_message or is_exception_allowed(exception, allow_list):
+    elif keep_message or is_exception_allowed(exception, allow_list):
         message = f"{prefix} {err.args[0]}"
         raise type(err)(message) from err
     else:
