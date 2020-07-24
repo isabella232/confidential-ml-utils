@@ -10,7 +10,7 @@ strict compliance and privacy guarantees they provide to their customers. This
 repository contains a set of utilities for confidential ML, with a special
 emphasis on using PyTorch in
 [Azure Machine Learning pipelines](https://aka.ms/pl-concept).
-
+ 
 ## Using
 
 VS Code Snippets see:
