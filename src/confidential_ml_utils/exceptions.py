@@ -57,12 +57,13 @@ def is_exception_allowed(exception: TracebackException, allow_list: list) -> boo
     return False
 
 
-def print_prefixed_stack_trace(
+def print_prefixed_stack_trace_and_raise(
     file: io.TextIOBase = sys.stderr,
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
     allow_list: list = [],
+    err: BaseException = None,
 ) -> None:
     """
     Print the current exception and stack trace to `file` (usually client
@@ -72,7 +73,9 @@ def print_prefixed_stack_trace(
             allowed).
         allow_list (list): exception allow_list. Ignored if keep_message is True. If
             empty all messages will be srubbed.
+        err: the error that was thrown. None accepted for backwards compatibility.
     """
+    # scrub the log
     exception = TracebackException(*sys.exc_info())
     if keep_message:
         scrubbed_exception = exception
@@ -88,6 +91,16 @@ def print_prefixed_stack_trace(
         lines = execution.splitlines()
         for line in lines:
             print(f"{prefix} {line}", file=file)
+
+    # raise compliant error
+    if not err:
+        raise
+    elif keep_message or is_exception_allowed(exception, allow_list):
+        message = f"{prefix} {err.args[0]}"
+        raise type(err)(message) from err
+    else:
+        message = f"{prefix} {scrub_message}"
+        raise type(err)(message) from err
 
 
 def prefix_stack_trace(
@@ -124,11 +137,10 @@ def prefix_stack_trace(
             """
             try:
                 return function(*func_args, **func_kwargs)
-            except BaseException:
-                print_prefixed_stack_trace(
-                    file, prefix, scrub_message, keep_message, allow_list
+            except BaseException as err:
+                print_prefixed_stack_trace_and_raise(
+                    file, prefix, scrub_message, keep_message, allow_list, err
                 )
-                raise
 
         return function if disable else wrapper
 
