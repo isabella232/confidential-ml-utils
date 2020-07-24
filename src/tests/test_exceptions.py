@@ -4,7 +4,7 @@ from confidential_ml_utils.exceptions import (
     prefix_stack_trace,
     SCRUB_MESSAGE,
     PREFIX,
-    is_exception_allowed
+    is_exception_allowed,
 )
 from traceback import TracebackException
 
@@ -163,7 +163,7 @@ def test_is_exception_allowed(allow_list, expected_result):
     [
         (True, []),  # unscrub message
         (False, []),  # scrub message
-        (False, ["ValueError"])  # unscrub whitelisted message
+        (False, ["ValueError"]),  # unscrub whitelisted message
     ],
 )
 def test_prefix_stack_trace_throws_correctly(keep_message, allow_list):
@@ -177,7 +177,6 @@ def test_prefix_stack_trace_throws_correctly(keep_message, allow_list):
 
     message = "This is the original exception message"
     e_type = ValueError
-    e_typename = 'ValueError'
 
     @prefix_stack_trace(file, keep_message=keep_message, allow_list=allow_list)
     def function():
@@ -186,10 +185,12 @@ def test_prefix_stack_trace_throws_correctly(keep_message, allow_list):
     with pytest.raises(ValueError) as info:
         function()
 
-    if keep_message == True or is_exception_allowed(TracebackException.from_exception(info.value), allow_list):
+    if keep_message is True or is_exception_allowed(
+        TracebackException.from_exception(info.value), allow_list
+    ):
         assert message in str(info.value)
     else:
         assert SCRUB_MESSAGE in str(info.value)
-    
+
     assert PREFIX in str(info.value)
     assert info.type == e_type

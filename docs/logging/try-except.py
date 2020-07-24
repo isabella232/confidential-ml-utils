@@ -8,7 +8,7 @@ from confidential_ml_utils.exceptions import print_prefixed_stack_trace_and_rais
 try:
     # Import statement which could raise an exception containing sensitive
     # data.
-    import my_custom_library
+    import my_custom_library  # noqa: F401
 except BaseException as e:
     # Output will be:
     #
@@ -21,7 +21,7 @@ except BaseException as e:
 try:
     # Import statement which will never raise an exception containing sensitive
     # data.
-    import another_custom_library
+    import another_custom_library  # noqa: F401
 except BaseException as e:
     # Output will be:
     #
