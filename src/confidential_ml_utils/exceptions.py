@@ -145,3 +145,28 @@ def prefix_stack_trace(
         return function if disable else wrapper
 
     return decorator
+
+
+class PrefixStackTrace:
+    def __init__(
+        self,
+        file: io.TextIOBase = sys.stderr,
+        disable: bool = sys.flags.debug,
+        prefix: str = PREFIX,
+        scrub_message: str = SCRUB_MESSAGE,
+        keep_message: bool = False,
+    ):
+        self.file = file
+        self.disable = disable
+        self.prefix = prefix
+        self.scrub_message = scrub_message
+        self.keep_message = keep_message
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type and not self.disable:
+            print_prefixed_stack_trace_and_raise(
+                self.file, self.prefix, self.scrub_message, self.keep_message
+            )

@@ -5,6 +5,7 @@ from confidential_ml_utils.exceptions import (
     SCRUB_MESSAGE,
     PREFIX,
     is_exception_allowed,
+    PrefixStackTrace,
 )
 from traceback import TracebackException
 
@@ -67,22 +68,31 @@ def test_prefix_stack_trace_respects_prefix(prefix):
     assert prefix in file.getvalue()
 
 
-@pytest.mark.parametrize("message", ["foo__"])
-def test_prefix_stack_trace_respects_scrub_message(message):
+@pytest.mark.parametrize(
+    "disable,prefix,message", [(False, "pref", "mess"), (True, "foo", "bar")]
+)
+def test_prefix_stack_trace_respects_scrub_message(disable, prefix, message):
     """
     Verify that the "message scrubbed" string added in by `prefix_stack_trace`
     respects the provided configuration.
     """
     file = io.StringIO()
 
-    @prefix_stack_trace(file, scrub_message=message)
     def function():
-        raise Exception()
+        raise Exception(message)
 
     with pytest.raises(Exception):
-        function()
+        with PrefixStackTrace(
+            disable=disable, prefix=prefix, scrub_message=message, file=file
+        ):
+            function()
 
-    assert message in file.getvalue()
+    file_value = file.getvalue()
+    if disable:
+        assert "" == file_value
+    else:
+        assert prefix in file_value
+        assert message in file_value
 
 
 @pytest.mark.parametrize(

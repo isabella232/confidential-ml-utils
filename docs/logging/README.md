@@ -26,5 +26,8 @@ Some configuration options around prefixing the stack trace. [prefix-stack-trace
 -  pass an allow_list of strings. Exception messages will be scrubbed unless the message or the
 exception type regex match one of the allow_list strings.
 
+Use this library with `with` statements:
+[with-statement.py](./with-statement.py).
+
 Using this library directly inside `try` / `except` statements:
-[try-except.py](./try-except.py)
+[try-except.py](./try-except.py).
