@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """
 Simplest example of how to use the prefix_stack_trace decorator.
 """

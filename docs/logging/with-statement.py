@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """
 Simple script with examples of how to use "with statements" to capture
 information about failed module imports.

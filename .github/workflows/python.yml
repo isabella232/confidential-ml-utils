@@ -18,6 +18,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Check License Lines
+      uses: kt3k/license_checker@v1.0.3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2.1.2
       with:

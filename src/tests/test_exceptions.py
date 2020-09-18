@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 import io
 import pytest
 from confidential_ml_utils.exceptions import (

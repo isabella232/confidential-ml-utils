@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """
 Decorators and utilities for prefixing exception stack traces while obscuring
 the exception message itself.

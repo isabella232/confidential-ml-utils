@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+
 """
 Setup script for this Python package.
 https://docs.python.org/3/distutils/setupscript.html
