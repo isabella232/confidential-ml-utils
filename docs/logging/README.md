@@ -31,3 +31,16 @@ Use this library with `with` statements:
 
 Using this library directly inside `try` / `except` statements:
 [try-except.py](./try-except.py).
+
+## Exception or Stack trace parsing
+
+[StacktraceExtractor](../../src/confidential_ml_utils/StacktraceExtractor.py) is a simple tool to grab Python or C# stack
+traces and exceptions from log files. Sometimes the file that has the stack trace you need may also contain sensitive
+data. Use this tool to parse and print the stack trace, exception type and optionally exception message (careful as 
+exception messages may also potentially hold private data.)
+
+```python
+ee = StacktraceExtractor()
+ee.extract("log_file")
+
+```

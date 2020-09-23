@@ -36,6 +36,23 @@ def test_prefix_stack_trace_preserves_exception_type(message: str, exec_type):
     assert SCRUB_MESSAGE in log_lines
 
 
+def test_prefix_stack_trace_succeeds_when_no_message():
+    """
+    Verify that exceptions without message are re-raised correctly.
+    """
+    file = io.StringIO()
+
+    @prefix_stack_trace(file, keep_message=True)
+    def function():
+        assert False
+
+    with pytest.raises(AssertionError):
+        function()
+
+    log_lines = file.getvalue()
+    assert AssertionError.__name__ in log_lines
+
+
 def test_prefix_stack_trace_respects_disable():
     """
     Verify that the parameter `disable` of `prefix_stack_trace` turns off the
