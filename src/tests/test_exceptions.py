@@ -70,6 +70,30 @@ def test_prefix_stack_trace_respects_disable():
     assert file.getvalue() == ""
 
 
+@pytest.mark.parametrize(
+    "prefix,exec_type,message,keep",
+    [
+        ("foo", ArithmeticError, "secret data", False),
+        ("baz", Exception, "you shouldn't see this", True),
+    ],
+)
+def test_prefix_stack_trace_respects_keep_message(prefix, exec_type, message, keep):
+    with pytest.raises(exec_type) as exec_info:
+        with PrefixStackTrace(prefix=prefix, keep_message=keep):
+            raise exec_type(message)
+
+    assert prefix in str(exec_info.value)
+    assert (message in str(exec_info.value)) == keep
+
+
+def test_prefix_stack_trace_default_doesnt_keep_message():
+    with pytest.raises(Exception) as exec_info:
+        with PrefixStackTrace(prefix="pref"):
+            raise Exception("msg")
+
+    assert "msg" not in str(exec_info.value)
+
+
 @pytest.mark.parametrize("prefix", ["foo__"])
 def test_prefix_stack_trace_respects_prefix(prefix):
     """

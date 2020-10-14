@@ -174,5 +174,9 @@ class PrefixStackTrace:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type and not self.disable:
             print_prefixed_stack_trace_and_raise(
-                self.file, self.prefix, self.scrub_message, self.keep_message
+                self.file,
+                self.prefix,
+                self.scrub_message,
+                self.keep_message,
+                err=exc_value,
             )
