@@ -37,7 +37,7 @@ jobs:
       working-directory: src
     - name: pytest
       run: |
-        pytest src
+        coverage run -m pytest src
     - name: build wheel
       run: |
         python setup.py sdist bdist_wheel
