@@ -2,6 +2,7 @@
 # Licensed under the MIT license.
 
 import confidential_ml_utils.stackTraceExtractor as ste
+import pathlib
 import re
 
 
@@ -69,7 +70,9 @@ def test_parse_file(capsys):
     """
     Verify that parsing entire file runs correctly.
     """
-    file = "src/tests/log.err"
+
+    HERE = pathlib.Path(__file__).parent
+    file = str(HERE / "log.err")
     extractor = ste.StackTraceExtractor()
     extractor._parse_file(file)
     captured = capsys.readouterr()

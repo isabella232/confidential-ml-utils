@@ -5,4 +5,7 @@
 Confidential ML utilities.
 """
 
-__version__ = "0.5.2"
+
+from .logging import enable_confidential_logging  # noqa: F401
+
+__version__ = "0.6.0"

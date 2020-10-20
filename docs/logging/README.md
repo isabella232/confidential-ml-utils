@@ -15,6 +15,14 @@ if __name__ == "__main__":
     main()
 ```
 
+## Logging
+
+Call `confidential_ml_utils.enable_confidential_logging` to set up data
+category-aware logging. Then continue to use standard Python logging
+functionality as before! Add a `category=DataCategory.PUBLIC` argument to have
+your log lines prefixed with `SystemLog:`. For a full-fledged example, see
+[data-category.py](./data-category.py).
+
 ## Examples
 
 The simplest use case (wrap your `main` method in a decorator) is in:
@@ -42,5 +50,4 @@ exception messages may also potentially hold private data.)
 ```python
 ee = StacktraceExtractor()
 ee.extract("log_file")
-
 ```
