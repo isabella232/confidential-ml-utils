@@ -109,6 +109,54 @@ def print_prefixed_stack_trace_and_raise(
         raise type(err)(message) from err
 
 
+class _PrefixStackTraceWrapper:
+    """
+    Callable object for catching exceptions and printing their stack traces,
+    appropriately prefixed.
+
+    This is an object instead of a nested function to support working in Spark.
+    Python anonymous functions are not "pickleable", so we need to define a
+    class which handles this logic, so the class is picklable.
+    """
+
+    def __init__(
+        self,
+        file: io.TextIOBase,
+        disable: bool,
+        prefix: str,
+        scrub_message: str,
+        keep_message: bool,
+        allow_list: list,
+    ) -> None:
+        self.allow_list = allow_list
+        self.disable = disable
+        self.file = file
+        self.keep_message = keep_message
+        self.prefix = prefix
+        self.scrub_message = scrub_message
+
+    def __call__(self, function) -> Callable:
+        @functools.wraps(function)
+        def wrapper(*func_args, **func_kwargs):
+            """
+            Create a wrapper which catches exceptions thrown by `function`,
+            scrub exception messages, and logs the prefixed stack trace.
+            """
+            try:
+                return function(*func_args, **func_kwargs)
+            except BaseException as err:
+                print_prefixed_stack_trace_and_raise(
+                    self.file,
+                    self.prefix,
+                    self.scrub_message,
+                    self.keep_message,
+                    self.allow_list,
+                    err,
+                )
+
+        return function if self.disable else wrapper
+
+
 def prefix_stack_trace(
     file: io.TextIOBase = sys.stderr,
     disable: bool = sys.flags.debug,
@@ -128,29 +176,9 @@ def prefix_stack_trace(
             pass
     """
 
-    def decorator(function: Callable) -> Callable:
-        """
-        Create a decorator to catch, modify, and log an exception with its
-        stack trace. Follows:
-        https://www.blog.pythonlibrary.org/2016/06/09/python-how-to-create-an-exception-logging-decorator/
-        """
-
-        @functools.wraps(function)
-        def wrapper(*func_args, **func_kwargs):
-            """
-            Create a wrapper which catches exceptions thrown by `function`,
-            scrub exception messages, and logs the prefixed stack trace.
-            """
-            try:
-                return function(*func_args, **func_kwargs)
-            except BaseException as err:
-                print_prefixed_stack_trace_and_raise(
-                    file, prefix, scrub_message, keep_message, allow_list, err
-                )
-
-        return function if disable else wrapper
-
-    return decorator
+    return _PrefixStackTraceWrapper(
+        file, disable, prefix, scrub_message, keep_message, allow_list
+    )
 
 
 class PrefixStackTrace:

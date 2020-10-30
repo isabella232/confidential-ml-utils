@@ -2,8 +2,10 @@
 # Licensed under the MIT license.
 
 import io
+import pickle
 import pytest
 from confidential_ml_utils.exceptions import (
+    _PrefixStackTraceWrapper,
     prefix_stack_trace,
     SCRUB_MESSAGE,
     PREFIX,
@@ -248,3 +250,20 @@ def test_prefix_stack_trace_throws_correctly(keep_message, allow_list):
 
     assert PREFIX in str(info.value)
     assert info.type == e_type
+
+
+@pytest.mark.parametrize(
+    "allow_list,disable,file,keep_message,prefix,scrub_message",
+    [([], True, io.StringIO(), "keep", "prefix", "scrub")],
+)
+def test__PrefixStackTraceWrapper_is_pickleable(
+    allow_list, disable, file, keep_message, prefix, scrub_message
+):
+    pst = _PrefixStackTraceWrapper(
+        file, disable, prefix, scrub_message, keep_message, allow_list
+    )
+
+    data = pickle.dumps(pst)
+    unpickled = pickle.loads(data)
+
+    assert isinstance(unpickled, _PrefixStackTraceWrapper)
