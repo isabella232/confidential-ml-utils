@@ -13,6 +13,7 @@ from traceback import TracebackException
 from typing import Callable
 import sys
 import re
+import time
 
 
 PREFIX = "SystemLog:"
@@ -66,6 +67,7 @@ def print_prefixed_stack_trace_and_raise(
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
     allow_list: list = [],
+    add_timestamp: bool = False,
     err: BaseException = None,
 ) -> None:
     """
@@ -93,7 +95,11 @@ def print_prefixed_stack_trace_and_raise(
             continue
         lines = execution.splitlines()
         for line in lines:
-            print(f"{prefix} {line}", file=file)
+            if add_timestamp:
+                current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                print(f"{prefix} {current_time} {line}", file=file)
+            else:
+                print(f"{prefix} {line}", file=file)
 
     # raise compliant error
     if not err:
@@ -127,6 +133,7 @@ class _PrefixStackTraceWrapper:
         scrub_message: str,
         keep_message: bool,
         allow_list: list,
+        add_timestamp: bool,
     ) -> None:
         self.allow_list = allow_list
         self.disable = disable
@@ -134,6 +141,7 @@ class _PrefixStackTraceWrapper:
         self.keep_message = keep_message
         self.prefix = prefix
         self.scrub_message = scrub_message
+        self.add_timestamp = add_timestamp
 
     def __call__(self, function) -> Callable:
         @functools.wraps(function)
@@ -151,6 +159,7 @@ class _PrefixStackTraceWrapper:
                     self.scrub_message,
                     self.keep_message,
                     self.allow_list,
+                    self.add_timestamp,
                     err,
                 )
 
@@ -164,6 +173,7 @@ def prefix_stack_trace(
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
     allow_list: list = [],
+    add_timestamp: bool = False,
 ) -> Callable:
     """
     Decorator which wraps the decorated function and prints the stack trace of
@@ -177,7 +187,7 @@ def prefix_stack_trace(
     """
 
     return _PrefixStackTraceWrapper(
-        file, disable, prefix, scrub_message, keep_message, allow_list
+        file, disable, prefix, scrub_message, keep_message, allow_list, add_timestamp
     )
 
 
@@ -189,12 +199,16 @@ class PrefixStackTrace:
         prefix: str = PREFIX,
         scrub_message: str = SCRUB_MESSAGE,
         keep_message: bool = False,
+        add_timestamp: bool = False,
+        allow_list: list = [],
     ):
         self.file = file
         self.disable = disable
         self.prefix = prefix
         self.scrub_message = scrub_message
         self.keep_message = keep_message
+        self.add_timestamp = add_timestamp
+        self.allow_list = allow_list
 
     def __enter__(self):
         pass
@@ -202,9 +216,11 @@ class PrefixStackTrace:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type and not self.disable:
             print_prefixed_stack_trace_and_raise(
-                self.file,
-                self.prefix,
-                self.scrub_message,
-                self.keep_message,
+                file=self.file,
+                prefix=self.prefix,
+                scrub_message=self.scrub_message,
+                keep_message=self.keep_message,
+                allow_list=self.allow_list,
+                add_timestamp=self.add_timestamp,
                 err=exc_value,
             )

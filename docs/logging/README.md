@@ -1,3 +1,6 @@
+## Installation
+Install the latest version in your Python evironment from `PyPi`: [confidential-ml-utils](https://pypi.org/project/confidential-ml-utils/)
+
 ## Exception Handling
 
 First execute `pip install confidential-ml-utils` to install this library. Then

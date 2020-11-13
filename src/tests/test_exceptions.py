@@ -4,6 +4,7 @@
 import io
 import pickle
 import pytest
+import re
 from confidential_ml_utils.exceptions import (
     _PrefixStackTraceWrapper,
     prefix_stack_trace,
@@ -253,17 +254,39 @@ def test_prefix_stack_trace_throws_correctly(keep_message, allow_list):
 
 
 @pytest.mark.parametrize(
-    "allow_list,disable,file,keep_message,prefix,scrub_message",
-    [([], True, io.StringIO(), "keep", "prefix", "scrub")],
+    "allow_list,disable,file,keep_message,prefix,scrub_message, add_timestamp",
+    [([], True, io.StringIO(), "keep", "prefix", "scrub", True)],
 )
 def test__PrefixStackTraceWrapper_is_pickleable(
-    allow_list, disable, file, keep_message, prefix, scrub_message
+    allow_list, disable, file, keep_message, prefix, scrub_message, add_timestamp
 ):
     pst = _PrefixStackTraceWrapper(
-        file, disable, prefix, scrub_message, keep_message, allow_list
+        file, disable, prefix, scrub_message, keep_message, allow_list, add_timestamp
     )
 
     data = pickle.dumps(pst)
     unpickled = pickle.loads(data)
 
     assert isinstance(unpickled, _PrefixStackTraceWrapper)
+
+
+@pytest.mark.parametrize("add_timestamp", [(False), (True)])
+def test_prefix_stack_trace_respects_add_timestamp(add_timestamp):
+    """
+    Verify that scrubbed stack trace includes timestamp when
+    add_timestamp parameter is set to true.
+    """
+    file = io.StringIO()
+
+    def function():
+        raise Exception("some exception message")
+
+    with pytest.raises(Exception):
+        with PrefixStackTrace(add_timestamp=add_timestamp, file=file):
+            function()
+
+    file_value = file.getvalue()
+    timestamp_regex = r" [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} "
+    timestamp_match = re.search(timestamp_regex, file_value.split("\n")[0])
+    assert bool(timestamp_match) == add_timestamp
+    print("hello")

@@ -51,6 +51,17 @@ def keep_allowed_exceptions():
     print(1 / 0)
 
 
+# Output will be:
+#
+# SystemLog: 2020-11-12 16:56:59 Traceback (most recent call last):
+# SystemLog: 2020-11-12 16:56:59   File "prefix-stack-trace.py", line 56, in keep_allowed_exceptions
+# SystemLog: 2020-11-12 16:56:59     print(1 / 0)
+# SystemLog: 2020-11-12 16:56:59 ZeroDivisionError: **Exception message scrubbed**
+@prefix_stack_trace(add_timestamp=True)
+def add_timestamp():
+    print(1 / 0)
+
+
 if __name__ == "__main__":
     try:
         custom_prefix()
@@ -66,5 +77,9 @@ if __name__ == "__main__":
         pass
     try:
         keep_allowed_exceptions()
+    except:
+        pass
+    try:
+        add_timestamp()
     except:
         pass
