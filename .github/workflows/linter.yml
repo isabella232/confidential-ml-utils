@@ -1,6 +1,8 @@
 name: super-linter
 
 on:
+  push:
+    branches: [ linter, master ]
   pull_request:
     branches: [ master ]
 

@@ -11,15 +11,16 @@ seeing the training data. It is needed in many enterprises to satisfy the
 strict compliance and privacy guarantees they provide to their customers. This
 repository contains a set of utilities for confidential ML, with a special
 emphasis on using PyTorch in
-[Azure Machine Learning pipelines](https://aka.ms/pl-concept).
+[Azure Machine Learning pipelines](https://aka.ms/pl-concept)
+([getting started](https://docs.microsoft.com/en-us/azure/machine-learning/tutorial-1st-experiment-sdk-setup-local))
  
 ## Using
 
-VS Code Snippets see:
-[docs/snippets](https://github.com/Azure/confidential-ml-utils/blob/master/docs/snippets/README.md)
-
 Compliant logging library see:
 [docs/logging](https://github.com/Azure/confidential-ml-utils/blob/master/docs/logging/README.md)
+
+VS Code Snippets see:
+[docs/snippets](https://github.com/Azure/confidential-ml-utils/blob/master/docs/snippets/README.md)
 
 ## Contributing
 

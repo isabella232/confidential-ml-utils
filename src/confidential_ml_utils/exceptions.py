@@ -105,10 +105,11 @@ def print_prefixed_stack_trace_and_raise(
     if not err:
         raise
     elif keep_message or is_exception_allowed(exception, allow_list):
-        if not err.args:
+        args = getattr(err, "args", None)
+        if not args:
             raise type(err) from err
         else:
-            message = f"{prefix} {err.args[0]}"
+            message = f"{prefix} {args[0]}"
             raise type(err)(message) from err
     else:
         message = f"{prefix} {scrub_message}"
