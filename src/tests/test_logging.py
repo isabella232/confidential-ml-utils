@@ -110,5 +110,6 @@ def test_warn_if_root_handlers_already_exist(capsys):
 
     confidential_ml_utils.enable_confidential_logging()
 
-    stderr = capsys.readouterr().out
+    # https://docs.pytest.org/en/stable/capture.html
+    stderr = capsys.readouterr().err
     assert "SystemLog:The root logger already has handlers set!" in stderr
