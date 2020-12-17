@@ -66,7 +66,7 @@ def scrub_exception_traceback(
     will be replaced with `exceptions.SCRUB_MESSAGE`.
     """
     if not is_exception_allowed(exception, allow_list):
-        exception._str = scrub_message
+        exception._str = scrub_message  # type: ignore
     if exception.__cause__:
         exception.__cause__ = scrub_exception_traceback(
             exception.__cause__, scrub_message, allow_list
@@ -92,7 +92,7 @@ def is_exception_allowed(exception: TracebackException, allow_list: list) -> boo
     """
     # empty list means all messages are allowed
     for expr in allow_list + default_allow_list:
-        if re.search(expr, exception._str, re.IGNORECASE):
+        if re.search(expr, exception._str, re.IGNORECASE):  # type: ignore
             return True
         if re.search(expr, exception.exc_type.__name__, re.IGNORECASE):
             return True
@@ -137,7 +137,7 @@ def print_prefixed_stack_trace_and_raise(
         err: the error that was thrown. None accepted for backwards compatibility.
     """
     # scrub the log
-    exception = TracebackException(*sys.exc_info())
+    exception = TracebackException(*sys.exc_info())  # type: ignore
     if keep_message:
         scrubbed_exception = exception
     else:
