@@ -143,6 +143,17 @@ class ConfidentialLogger(logging.getLoggerClass()):
             self._log(CRITICAL, msg, category, args, **kwargs)
 
 
+_logging_basic_config_set_warning = """
+********************************************************************************
+The root logger already has handlers set! As a result, the behavior of this
+library is undefined. If running in Python >= 3.8, this library will attempt to
+call logging.basicConfig(force=True), which will remove all existing root
+handlers. See https://stackoverflow.com/q/20240464 and
+https://github.com/Azure/confidential-ml-utils/issues/33 for more information.
+********************************************************************************
+"""
+
+
 def enable_confidential_logging(prefix: str = "SystemLog:", **kwargs) -> None:
     """
     The default format is `logging.BASIC_FORMAT` (`%(levelname)s:%(name)s:%(message)s`).
@@ -174,19 +185,11 @@ def enable_confidential_logging(prefix: str = "SystemLog:", **kwargs) -> None:
 
     if len(logging.root.handlers) > 0:
         p = get_prefix()
-        print(f"{p}************************************************************", file=sys.stderr)
-        print(f"{p}The root logger already has handlers set! As a result, the", file=sys.stderr)
-        print(f"{p}behavior of this library is undefined. If running in an", file=sys.stderr)
-        print(f"{p}environment where Python >= 3.8, this library will attempt", file=sys.stderr)
-        print(f"{p}call logging.basicConfig(force=True), which will remove all", file=sys.stderr)
-        print(f"{p}existing root handlers. See", file=sys.stderr)
-        print(f"{p}https://stackoverflow.com/q/20240464 for more information.", file=sys.stderr)
-        print(f"{p}************************************************************", file=sys.stderr)
+        for line in _logging_basic_config_set_warning.splitlines():
+            print(f"{p}{line}", file=sys.stderr)
 
-
-    if "force" not in kwargs and sys.version_info >= (3,8):
+    if "force" not in kwargs and sys.version_info >= (3, 8):
         kwargs["force"] = True
-
 
     old_root = logging.root
 

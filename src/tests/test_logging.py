@@ -104,7 +104,6 @@ def test_enable_confidential_logging_sets_force():
     assert all(h not in logging.root.handlers for h in initial_handlers)
 
 
-
 def test_warn_if_root_handlers_already_exist(capsys):
     # Pytest adds handlers to the root logger by default.
 

@@ -22,7 +22,19 @@ Compliant logging library see:
 Minimal use case:
 
 ```python
-TODO: ...
+from confidential_ml_utils import DataCategory, enable_confidential_logging, prefix_stack_trace
+import logging
+
+
+@prefix_stack_trace(allow_list=["FileNotFoundError", "TypeError"])
+def main():
+    enable_confidential_logging()
+
+    log = logging.getLogger(__name__)
+    log.info("Hi there", category=DataCategory.PUBLIC)
+
+if __name__ == "__main__":
+    main()
 ```
 
 VS Code Snippets see:
