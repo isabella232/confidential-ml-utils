@@ -16,11 +16,17 @@ emphasis on using PyTorch in
  
 ## Using
 
-VS Code Snippets see:
-[docs/snippets](https://github.com/Azure/confidential-ml-utils/blob/master/docs/snippets/README.md)
-
 Compliant logging library see:
 [docs/logging](https://github.com/Azure/confidential-ml-utils/blob/master/docs/logging/README.md)
+
+Minimal use case:
+
+```python
+TODO: ...
+```
+
+VS Code Snippets see:
+[docs/snippets](https://github.com/Azure/confidential-ml-utils/blob/master/docs/snippets/README.md)
 
 ## Contributing
 

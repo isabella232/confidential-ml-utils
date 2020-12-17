@@ -12,6 +12,9 @@ from confidential_ml_utils.exceptions import (
     PREFIX,
     is_exception_allowed,
     PrefixStackTrace,
+    PublicArgumentError,
+    PublicRuntimeError,
+    PublicValueError,
 )
 from traceback import TracebackException
 
@@ -290,3 +293,30 @@ def test_prefix_stack_trace_respects_add_timestamp(add_timestamp):
     timestamp_match = re.search(timestamp_regex, file_value.split("\n")[0])
     assert bool(timestamp_match) == add_timestamp
     print("hello")
+
+
+@pytest.mark.parametrize(
+    "exc_type,msg", [(PublicRuntimeError, "message"), (PublicValueError, "message")]
+)
+def test_public_exception_messages_are_preserved(exc_type, msg):
+    file = io.StringIO()
+
+    with pytest.raises(exc_type):
+        with PrefixStackTrace(file=file):
+            raise exc_type(msg)
+
+    file_value = file.getvalue()
+
+    assert re.search(fr"SystemLog\:.*{msg}", file_value)
+
+
+def test_public_argument_error_message_is_preserved():
+    file = io.StringIO()
+
+    with pytest.raises(PublicArgumentError):
+        with PrefixStackTrace(file=file):
+            raise PublicArgumentError(None, "message")
+
+    file_value = file.getvalue()
+
+    assert re.search(r"SystemLog\:.*message", file_value)

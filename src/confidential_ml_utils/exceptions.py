@@ -7,10 +7,11 @@ the exception message itself.
 """
 
 
+import argparse
 import functools
 import io
 from traceback import TracebackException
-from typing import Callable
+from typing import Callable, Optional
 import sys
 import re
 import time
@@ -18,6 +19,40 @@ import time
 
 PREFIX = "SystemLog:"
 SCRUB_MESSAGE = "**Exception message scrubbed**"
+
+
+class PublicValueError(ValueError):
+    """
+    Value error with public message. Exceptions of this type raised under
+    `prefix_stack_trace` or `print_prefixed_stack_trace_and_raise` will have
+    the message prefixed with `PREFIX` in both the printed stack trace and the
+    re-raised exception.
+    """
+
+
+class PublicRuntimeError(RuntimeError):
+    """
+    Runtime error with public message. Exceptions of this type raised under
+    `prefix_stack_trace` or `print_prefixed_stack_trace_and_raise` will have
+    the message prefixed with `PREFIX` in both the printed stack trace and the
+    re-raised exception.
+    """
+
+
+class PublicArgumentError(argparse.ArgumentError):
+    """
+    Argument error with public message. Exceptions of this type raised under
+    `prefix_stack_trace` or `print_prefixed_stack_trace_and_raise` will have
+    the message prefixed with `PREFIX` in both the printed stack trace and the
+    re-raised exception.
+    """
+
+
+default_allow_list = [
+    PublicValueError.__name__,
+    PublicRuntimeError.__name__,
+    PublicArgumentError.__name__,
+]
 
 
 def scrub_exception_traceback(
@@ -44,21 +79,39 @@ def scrub_exception_traceback(
 
 def is_exception_allowed(exception: TracebackException, allow_list: list) -> bool:
     """
-    Check if message is allowed
+    Check if message is allowed, either by `allow_list`, or `default_allow_list`.
+
     Args:
         exception (TracebackException): the exception to test
         allow_list (list): list of regex expressions. If any expression matches
             the exception name or message, it will be considered allowed.
+
     Returns:
         bool: True if message is allowed, False otherwise.
     """
     # empty list means all messages are allowed
-    for expr in allow_list:
+    for expr in allow_list + default_allow_list:
         if re.search(expr, exception._str, re.IGNORECASE):
             return True
         if re.search(expr, exception.exc_type.__name__, re.IGNORECASE):
             return True
     return False
+
+
+def _rethrow_with_transformed_string_args(
+    err: Optional[BaseException], prefix: str, transform: Callable[[str], str]
+):
+    """
+    TODO: docs.
+    """
+    if not err.args:
+        raise type(err)() from err
+    else:
+        new_args = [
+            f"{prefix} {transform(arg)}" if isinstance(arg, str) else arg
+            for arg in err.args
+        ]
+        raise type(err)(*new_args) from err
 
 
 def print_prefixed_stack_trace_and_raise(
@@ -68,7 +121,7 @@ def print_prefixed_stack_trace_and_raise(
     keep_message: bool = False,
     allow_list: list = [],
     add_timestamp: bool = False,
-    err: BaseException = None,
+    err: Optional[BaseException] = None,
 ) -> None:
     """
     Print the current exception and stack trace to `file` (usually client
@@ -103,16 +156,11 @@ def print_prefixed_stack_trace_and_raise(
 
     # raise compliant error
     if not err:
-        raise
+        raise Exception()
     elif keep_message or is_exception_allowed(exception, allow_list):
-        if not err.args:
-            raise type(err) from err
-        else:
-            message = f"{prefix} {err.args[0]}"
-            raise type(err)(message) from err
+        _rethrow_with_transformed_string_args(err, prefix, lambda arg: arg)
     else:
-        message = f"{prefix} {scrub_message}"
-        raise type(err)(message) from err
+        _rethrow_with_transformed_string_args(err, prefix, lambda _: scrub_message)
 
 
 class _PrefixStackTraceWrapper:
@@ -168,7 +216,7 @@ class _PrefixStackTraceWrapper:
 
 def prefix_stack_trace(
     file: io.TextIOBase = sys.stderr,
-    disable: bool = sys.flags.debug,
+    disable: bool = bool(sys.flags.debug),
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
@@ -195,7 +243,7 @@ class PrefixStackTrace:
     def __init__(
         self,
         file: io.TextIOBase = sys.stderr,
-        disable: bool = sys.flags.debug,
+        disable: bool = bool(sys.flags.debug),
         prefix: str = PREFIX,
         scrub_message: str = SCRUB_MESSAGE,
         keep_message: bool = False,
