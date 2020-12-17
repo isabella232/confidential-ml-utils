@@ -2,7 +2,7 @@ name: python
 
 on:
   push:
-    branches: [main]
+    branches: [main, danmill/pyright]
     tags: [ 'v0.*' ]
   pull_request:
     branches: [main]
