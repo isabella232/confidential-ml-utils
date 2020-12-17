@@ -9,12 +9,12 @@ the exception message itself.
 
 import argparse
 import functools
-import io
-from traceback import TracebackException
-from typing import Callable, Optional
-import sys
 import re
+import sys
 import time
+from traceback import TracebackException
+# https://stackoverflow.com/a/38569536
+from typing import Callable, Optional, TextIO
 
 
 PREFIX = "SystemLog:"
@@ -102,9 +102,11 @@ def _rethrow_with_transformed_string_args(
     err: Optional[BaseException], prefix: str, transform: Callable[[str], str]
 ):
     """
-    TODO: docs.
+    Safely re-throw the exception `err`, transforming all **string**-valued
+    arguments using `transform`. Properly handle the cases a) `err` is `None`,
+    b) `err` does not have any `args`, c) `err` has non-string-valued args.
     """
-    if not err.args:
+    if not getattr(err, "args", None):
         raise type(err)() from err
     else:
         new_args = [
@@ -115,7 +117,7 @@ def _rethrow_with_transformed_string_args(
 
 
 def print_prefixed_stack_trace_and_raise(
-    file: io.TextIOBase = sys.stderr,
+    file: TextIO = sys.stderr,
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
     keep_message: bool = False,
@@ -175,7 +177,7 @@ class _PrefixStackTraceWrapper:
 
     def __init__(
         self,
-        file: io.TextIOBase,
+        file: TextIO,
         disable: bool,
         prefix: str,
         scrub_message: str,
@@ -215,7 +217,7 @@ class _PrefixStackTraceWrapper:
 
 
 def prefix_stack_trace(
-    file: io.TextIOBase = sys.stderr,
+    file: TextIO = sys.stderr,
     disable: bool = bool(sys.flags.debug),
     prefix: str = PREFIX,
     scrub_message: str = SCRUB_MESSAGE,
@@ -242,7 +244,7 @@ def prefix_stack_trace(
 class PrefixStackTrace:
     def __init__(
         self,
-        file: io.TextIOBase = sys.stderr,
+        file: TextIO = sys.stderr,
         disable: bool = bool(sys.flags.debug),
         prefix: str = PREFIX,
         scrub_message: str = SCRUB_MESSAGE,
