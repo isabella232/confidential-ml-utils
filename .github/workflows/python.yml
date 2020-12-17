@@ -28,18 +28,19 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r src/requirements.txt
-    - name: black
-      run: |
-        black --check src
-    - name: flake8
-      run: |
-        flake8 .
+    - run:  black --check src
+    - run:  flake8 .
       working-directory: src
       if: always()
-    - name: pytest
-      run: |
-        pytest src
+    - run: pytest src
       if: always()
+    - name: setup node.js for pyright
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: |
+        npm install -g pyright
+        pyright src
     - name: build wheel
       run: |
         python setup.py sdist bdist_wheel
