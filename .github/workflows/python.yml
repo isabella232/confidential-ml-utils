@@ -35,9 +35,11 @@ jobs:
       run: |
         flake8 .
       working-directory: src
+      if: always()
     - name: pytest
       run: |
         pytest src
+      if: always()
     - name: build wheel
       run: |
         python setup.py sdist bdist_wheel
