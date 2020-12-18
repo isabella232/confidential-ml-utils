@@ -4,6 +4,7 @@
 import glob
 import os
 import re
+from typing import Optional
 from confidential_ml_utils.exceptions import print_prefixed_stack_trace_and_raise
 
 
@@ -102,7 +103,7 @@ class StackTraceExtractor:
                     print(f"{self.prefix}: line: {m.groupdict()['line']}")
                     print(f"{self.prefix}: method: {m.groupdict()['method']}")
 
-    def _get_files(self, path) -> list:
+    def _get_files(self, path) -> Optional[list]:
         if os.path.isfile(path):
             print(f"{self.prefix}: Input is a file")
             return [path]
